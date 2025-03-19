@@ -1,6 +1,6 @@
 {
   "name": "keyv-dataloader",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A DataLoader implementation with caching support using Keyv",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
