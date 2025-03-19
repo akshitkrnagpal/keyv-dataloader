@@ -7,11 +7,11 @@
   "scripts": {
     "build": "tsc",
     "test": "jest --no-watchman",
-    "test:watch": "jest --watch --no-watchman",
-    "test:redis": "jest redis --no-watchman",
-    "test:docker": "docker-compose up -d && jest --no-watchman && docker-compose down",
-    "test:coverage": "jest --coverage --no-watchman",
-    "prepublishOnly": "npm run build",
+    "test:watch": "pnpm run test --watch",
+    "test:redis": "pnpm run test redis",
+    "test:docker": "docker compose up -d && pnpm run test && docker compose down",
+    "test:coverage": "pnpm run test --coverage --no-watchman",
+    "prepublishOnly": "pnpm run build",
     "changeset": "changeset",
     "version": "changeset version",
     "release": "changeset publish"

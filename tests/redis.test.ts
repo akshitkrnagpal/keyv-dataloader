@@ -4,15 +4,15 @@ import KeyvRedis from '@keyv/redis';
 const REDIS_URI = 'redis://localhost:6379';
 
 describe('KeyvDataLoader with Redis store', () => {
+  let store: KeyvRedis<any>;
+
+  beforeAll(async () => {
+    store = new KeyvRedis(REDIS_URI);
+  });
+
   // Reset mock and clear Redis before each test
   beforeEach(async () => {
-    // Clean Redis before each test
-    try {
-      const store = new KeyvRedis(REDIS_URI);
-      await store.clear();
-    } catch (error) {
-      console.warn('Failed to flush Redis, some tests may fail');
-    }
+    await store.clear();
   });
 
   describe('basic functionality', () => {
@@ -29,7 +29,7 @@ describe('KeyvDataLoader with Redis store', () => {
         batchLoadFn: testBatchLoadFn,
         ttl: 1000, // 1 second TTL for testing
         keyvOptions: {
-          store: new KeyvRedis(REDIS_URI),
+          store,
           namespace: 'test',
         },
       });
@@ -74,7 +74,7 @@ describe('KeyvDataLoader with Redis store', () => {
         batchLoadFn: testBatchLoadFn,
         ttl: 100, // 100ms TTL
         keyvOptions: {
-          store: new KeyvRedis(REDIS_URI),
+          store,
           namespace: 'test-ttl',
         },
       });
@@ -110,7 +110,7 @@ describe('KeyvDataLoader with Redis store', () => {
         batchLoadFn: testBatchLoadFn,
         ttl: 1000,
         keyvOptions: {
-          store: new KeyvRedis(REDIS_URI),
+          store,
         },
       });
     });
@@ -143,7 +143,7 @@ describe('KeyvDataLoader with Redis store', () => {
         batchLoadFn: testBatchLoadFn,
         ttl: 1000,
         keyvOptions: {
-          store: new KeyvRedis(REDIS_URI),
+          store,
         },
       });
     });
@@ -176,7 +176,7 @@ describe('KeyvDataLoader with Redis store', () => {
         batchLoadFn: testBatchLoadFn,
         ttl: 1000,
         keyvOptions: {
-          store: new KeyvRedis(REDIS_URI),
+          store,
         },
       });
     });
@@ -207,5 +207,9 @@ describe('KeyvDataLoader with Redis store', () => {
       // No additional call to batchLoadFn
       expect(testBatchLoadFn).toHaveBeenCalledTimes(1);
     });
+  });
+
+  afterAll(async () => {
+    await store.disconnect();
   });
 });
