@@ -117,41 +117,66 @@ export class KeyvDataLoader<K, V, C = K> {
   }
 
   /**
-   * Load a single key
+   * Loads a key, returning a `Promise` for the value represented by that key.
+   * 
+   * This behaves identically to DataLoader's load method.
    */
   load(key: K): Promise<V> {
     return this.dataloader.load(key);
   }
 
   /**
-   * Load multiple keys
+   * Loads multiple keys, returning a Promise that resolves to an array of values.
+   * 
+   * This behaves identically to DataLoader's loadMany method.
    */
   loadMany(keys: K[]): Promise<(V | Error)[]> {
     return this.dataloader.loadMany(keys);
   }
 
   /**
-   * Clear the cache for a specific key
+   * Clears the value for the key from dataloader and cache.
+   * 
+   * This behaves like DataLoader's clear method but also clears the key from Keyv cache.
    */
-  async clear(key: K): Promise<boolean> {
+  clear(key: K): this {
     this.dataloader.clear(key);
-    return this.cache.delete(this.cacheKeyFn(key));
+    // Fire and forget cache clearing - don't await
+    this.cache.delete(this.cacheKeyFn(key));
+    return this;
   }
 
   /**
-   * Clear multiple keys from the cache
+   * Clears multiple keys from dataloader and cache.
    */
-  async clearMany(keys: K[]): Promise<boolean> {
+  clearMany(keys: K[]): this {
     keys.forEach(key => this.dataloader.clear(key));
-    // Note: Keyv's deleteMany actually returns a boolean, not an array
-    return this.cache.deleteMany(keys.map(this.cacheKeyFn));
+    // Fire and forget cache clearing - don't await
+    this.cache.deleteMany(keys.map(this.cacheKeyFn));
+    return this;
   }
 
   /**
-   * Clear the entire cache
+   * Clears the entire cache dataloader and Keyv.
+   * 
+   * This behaves like DataLoader's clearAll method but also clears the entire Keyv cache.
    */
-  async clearAll(): Promise<void> {
+  clearAll(): this {
     this.dataloader.clearAll();
-    await this.cache.clear();
+    // Fire and forget cache clearing - don't await
+    this.cache.clear();
+    return this;
+  }
+
+  /**
+   * Primes the cache with the provided key and value, like DataLoader.
+   * 
+   * If the key already exists in the cache, it is replaced.
+   */
+  prime(key: K, value: V): this {
+    this.dataloader.prime(key, value);
+    // Fire and forget cache setting - don't await
+    this.cache.set(this.cacheKeyFn(key), value, this.ttl);
+    return this;
   }
 }

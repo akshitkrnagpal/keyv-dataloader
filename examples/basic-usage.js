@@ -34,24 +34,40 @@ async function main() {
   const user1Again = await userLoader.load(1);
   console.log('✅ User 1 (from cache):', user1Again);
   
+  console.log('\nPriming the cache with a value:');
+  userLoader.prime(4, { id: 4, name: 'User 4 (Primed)', email: 'user4@example.com' });
+  console.log('✅ User 4 primed in cache');
+  
+  console.log('\nLoading primed value (should not hit database):');
+  const user4 = await userLoader.load(4);
+  console.log('✅ User 4 (from prime):', user4);
+  
   console.log('\nBatch request (user 2 and 3 not cached, will be fetched in batch):');
   const [user2, user3] = await userLoader.loadMany([2, 3]);
   console.log('✅ User 2:', user2);
   console.log('✅ User 3:', user3);
   
-  console.log('\nBatch clear from cache:');
-  const clearResult = await userLoader.clearMany([1, 2]);
-  console.log('✅ Cleared multiple keys:', clearResult);
+  console.log('\nDemonstrating method chaining:');
+  userLoader
+    .clear(1)
+    .clear(2)
+    .prime(5, { id: 5, name: 'User 5 (Chained Prime)', email: 'user5@example.com' });
+  console.log('✅ Cleared users 1 and 2, primed user 5');
   
   console.log('\nAfter clearing, users 1 and 2 should be fetched again in batch:');
-  const [user1Refetched, user2Refetched] = await userLoader.loadMany([1, 2]);
+  const [user1Refetched, user2Refetched, user5] = await userLoader.loadMany([1, 2, 5]);
   console.log('✅ User 1 (refetched):', user1Refetched);
   console.log('✅ User 2 (refetched):', user2Refetched);
+  console.log('✅ User 5 (from prime):', user5);
   
-  // Access cached users (should be served from cache)
-  console.log('\nAccessing all users (user 3 from cache, 1 and 2 just cached):');
-  const allUsers = await userLoader.loadMany([1, 2, 3]);
-  console.log('✅ All users:', allUsers);
+  console.log('\nClearing all cache:');
+  userLoader.clearAll();
+  console.log('✅ All cache cleared');
+  
+  // Access all users (should be fetched from database)
+  console.log('\nAccessing all users after clearing all (should hit database):');
+  const allUsers = await userLoader.loadMany([1, 2, 3, 4, 5]);
+  console.log('✅ All users fetched again:', allUsers.length);
 }
 
 main().catch(console.error);

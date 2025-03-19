@@ -1,6 +1,6 @@
 # keyv-dataloader
 
-A DataLoader implementation with caching support using [Keyv](https://github.com/jaredwray/keyv).
+A DataLoader implementation with caching support using [Keyv](https://github.com/jaredwray/keyv). Combines the batching capabilities of Facebook's DataLoader with the flexible caching of Keyv.
 
 ## Installation
 
@@ -39,28 +39,64 @@ const loader = new KeyvDataLoader({
   }
 });
 
-// Load a single value
+// Load a single value (returns a Promise)
 const value = await loader.load('key1');
 
-// Load multiple values
+// Load multiple values (returns a Promise)
 const values = await loader.loadMany(['key2', 'key3']);
 
-// Clear a value from cache
-await loader.clear('key1');
+// Prime the cache with a value (returns this for chaining)
+loader.prime('key4', 'Value for key4');
 
-// Clear multiple values from cache
-await loader.clearMany(['key1', 'key2']);
+// Clear a value from cache (returns this for chaining)
+loader.clear('key1');
 
-// Clear all cached values
-await loader.clearAll();
+// Clear multiple values from cache (returns this for chaining)
+loader.clearMany(['key2', 'key3']);
+
+// Clear all cached values (returns this for chaining)
+loader.clearAll();
+
+// Method chaining
+loader
+  .clear('key1')
+  .prime('key2', 'new value')
+  .prime('key3', 'another value');
 ```
+
+## API
+
+### `new KeyvDataLoader(options)`
+
+Creates a new `KeyvDataLoader` instance.
+
+#### Options
+
+- `batchLoadFn`: Function to batch load multiple keys
+- `cacheKeyFn` (optional): Function to generate cache key from the input key
+- `ttl` (optional): TTL in milliseconds for cache entries 
+- `dataLoaderOptions` (optional): DataLoader options
+- `keyvOptions` (optional): Keyv options
+
+### Methods
+
+- **`load(key)`**: Loads a key, returns a Promise for the value
+- **`loadMany(keys)`**: Loads multiple keys, returns a Promise for array of values
+- **`prime(key, value)`**: Prime the cache with a key-value pair
+- **`clear(key)`**: Clear a key from cache
+- **`clearMany(keys)`**: Clear multiple keys from cache (extension method)
+- **`clearAll()`**: Clear all keys from cache
+
+All methods except `load` and `loadMany` return the instance for method chaining.
 
 ## Features
 
+- **DataLoader Compatible**: Implements the same API as Facebook's DataLoader
 - **Batching**: Groups individual loads that occur within a single tick of the event loop into a single batch
 - **Efficient Caching**: Uses Keyv's batch methods (getMany, setMany, deleteMany) for optimal performance
 - **Flexible Storage**: Works with any Keyv storage adapter (Redis, MongoDB, SQLite, etc.)
 - **TypeScript Support**: Fully typed API
+- **Method Chaining**: All methods that don't return Promises support method chaining
 
 ## Performance
 
