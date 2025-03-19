@@ -57,12 +57,13 @@ describe('KeyvDataLoader with Redis store', () => {
 
     test('should cache results', async () => {
       // First load
-      await loader.load('redis4');
+      const cachedResult = await loader.load('redis6');
+      expect(cachedResult).toBe('Redis value for redis6');
       expect(batchLoadFn).toHaveBeenCalledTimes(1);
 
       // Second load (should be cached)
-      const cachedResult = await loader.load('redis4');
-      expect(cachedResult).toBe('Redis value for redis4');
+      const cachedResult2 = await loader.load('redis6');
+      expect(cachedResult2).toBe('Redis value for redis6');
 
       // Should not call batchLoadFn again
       expect(batchLoadFn).toHaveBeenCalledTimes(1);
@@ -83,10 +84,14 @@ describe('KeyvDataLoader with Redis store', () => {
       await shortTtlLoader.load('expiring');
       expect(batchLoadFn).toHaveBeenCalledTimes(1);
 
+      // Second load (should be cached)
+      await shortTtlLoader.load('expiring');
+      expect(batchLoadFn).toHaveBeenCalledTimes(1);
+
       // Wait for TTL to expire
       await new Promise((resolve) => setTimeout(resolve, 150));
 
-      // Second load (should not be cached anymore)
+      // Third load (should not be cached anymore)
       await shortTtlLoader.load('expiring');
       expect(batchLoadFn).toHaveBeenCalledTimes(2);
     }, 1000); // Increased timeout for this test

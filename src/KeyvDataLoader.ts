@@ -89,8 +89,12 @@ export class KeyvDataLoader<K, V, C = K> {
         ttl: this.ttl,
       }));
 
-      // Cache the loaded values using setMany
-      await this.cache.setMany(entries);
+      // Set cache entries
+      await Promise.all(
+        entries.map((entry) =>
+          this.cache.set(entry.key, entry.value, entry.ttl)
+        )
+      );
 
       // Merge cached and loaded results
       const results: (V | undefined)[] = [...cacheResults];
