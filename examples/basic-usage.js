@@ -39,15 +39,17 @@ async function main() {
   console.log('✅ User 2:', user2);
   console.log('✅ User 3:', user3);
   
-  console.log('\nClearing user 1 from cache:');
-  await userLoader.clear(1);
+  console.log('\nBatch clear from cache:');
+  const clearResult = await userLoader.clearMany([1, 2]);
+  console.log('✅ Cleared multiple keys:', clearResult);
   
-  console.log('\nAfter clearing, user 1 should be fetched again:');
-  const user1Refetched = await userLoader.load(1);
+  console.log('\nAfter clearing, users 1 and 2 should be fetched again in batch:');
+  const [user1Refetched, user2Refetched] = await userLoader.loadMany([1, 2]);
   console.log('✅ User 1 (refetched):', user1Refetched);
+  console.log('✅ User 2 (refetched):', user2Refetched);
   
   // Access cached users (should be served from cache)
-  console.log('\nAccessing all users (2 and 3 from cache, 1 just cached):');
+  console.log('\nAccessing all users (user 3 from cache, 1 and 2 just cached):');
   const allUsers = await userLoader.loadMany([1, 2, 3]);
   console.log('✅ All users:', allUsers);
 }

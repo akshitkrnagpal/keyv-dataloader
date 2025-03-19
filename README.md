@@ -48,6 +48,9 @@ const values = await loader.loadMany(['key2', 'key3']);
 // Clear a value from cache
 await loader.clear('key1');
 
+// Clear multiple values from cache
+await loader.clearMany(['key1', 'key2']);
+
 // Clear all cached values
 await loader.clearAll();
 ```
@@ -55,9 +58,13 @@ await loader.clearAll();
 ## Features
 
 - **Batching**: Groups individual loads that occur within a single tick of the event loop into a single batch
-- **Caching**: Uses Keyv to cache results with optional TTL support
+- **Efficient Caching**: Uses Keyv's batch methods (getMany, setMany, deleteMany) for optimal performance
 - **Flexible Storage**: Works with any Keyv storage adapter (Redis, MongoDB, SQLite, etc.)
 - **TypeScript Support**: Fully typed API
+
+## Performance
+
+By leveraging Keyv's batch operations (`getMany`, `setMany`, and `deleteMany`), this implementation reduces the number of I/O operations required when working with multiple keys, resulting in better performance compared to individual operations, especially when using remote storage adapters like Redis.
 
 ## License
 
