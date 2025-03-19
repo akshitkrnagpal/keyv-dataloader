@@ -4,6 +4,10 @@
   "description": "A DataLoader implementation with caching support using Keyv",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akshitkrnagpal/keyv-dataloader.git"
+  },
   "files": [
     "dist",
     "index.js",
