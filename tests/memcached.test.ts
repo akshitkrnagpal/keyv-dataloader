@@ -1,5 +1,5 @@
 import { KeyvDataLoader } from '../src';
-import KeyvMemcache from 'keyv-memcache';
+import KeyvMemcache from '@keyv/memcache';
 
 const MEMCACHED_URI = 'localhost:11211';
 

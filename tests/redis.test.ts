@@ -1,5 +1,5 @@
 import { KeyvDataLoader } from '../src';
-import KeyvRedis from 'keyv-redis';
+import KeyvRedis from '@keyv/redis';
 
 const REDIS_URI = 'redis://localhost:6379';
 
