@@ -147,16 +147,6 @@ export class KeyvDataLoader<K, V, C = K> {
   }
 
   /**
-   * Clears multiple keys from dataloader and cache.
-   */
-  clearMany(keys: K[]): this {
-    keys.forEach(key => this.dataloader.clear(key));
-    // Fire and forget cache clearing - don't await
-    this.cache.deleteMany(keys.map(this.cacheKeyFn));
-    return this;
-  }
-
-  /**
    * Clears the entire cache dataloader and Keyv.
    * 
    * This behaves like DataLoader's clearAll method but also clears the entire Keyv cache.
@@ -169,14 +159,27 @@ export class KeyvDataLoader<K, V, C = K> {
   }
 
   /**
-   * Primes the cache with the provided key and value, like DataLoader.
+   * Primes the cache with the provided key and value.
+   * If the key already exists, no change is made.
+   * (To forcefully prime the cache, clear the key first with 
+   * loader.clear(key).prime(key, value).)
    * 
-   * If the key already exists in the cache, it is replaced.
+   * To prime the cache with an error at a key, provide an Error instance.
+   * 
+   * Returns itself for method chaining.
    */
-  prime(key: K, value: V): this {
+  prime(key: K, value: V | Error): this {
     this.dataloader.prime(key, value);
-    // Fire and forget cache setting - don't await
-    this.cache.set(this.cacheKeyFn(key), value, this.ttl);
+    
+    // Only cache in Keyv if the key doesn't exist and value is not an Error
+    if (!(value instanceof Error)) {
+      this.cache.get(this.cacheKeyFn(key)).then(existingValue => {
+        if (existingValue === undefined) {
+          this.cache.set(this.cacheKeyFn(key), value, this.ttl);
+        }
+      });
+    }
+    
     return this;
   }
 }

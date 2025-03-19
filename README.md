@@ -46,22 +46,22 @@ const value = await loader.load('key1');
 const values = await loader.loadMany(['key2', 'key3']);
 
 // Prime the cache with a value (returns this for chaining)
+// If the key already exists, no change is made
 loader.prime('key4', 'Value for key4');
+
+// Prime the cache with an error
+loader.prime('key5', new Error('This is an error'));
 
 // Clear a value from cache (returns this for chaining)
 loader.clear('key1');
 
-// Clear multiple values from cache (returns this for chaining)
-loader.clearMany(['key2', 'key3']);
-
 // Clear all cached values (returns this for chaining)
 loader.clearAll();
 
-// Method chaining
+// Method chaining - force update a cached value
 loader
   .clear('key1')
-  .prime('key2', 'new value')
-  .prime('key3', 'another value');
+  .prime('key1', 'new value');
 ```
 
 ## API
@@ -82,9 +82,8 @@ Creates a new `KeyvDataLoader` instance.
 
 - **`load(key)`**: Loads a key, returns a Promise for the value
 - **`loadMany(keys)`**: Loads multiple keys, returns a Promise for array of values
-- **`prime(key, value)`**: Prime the cache with a key-value pair
+- **`prime(key, value)`**: Prime the cache with a key-value pair. If the key already exists, no change is made. To forcefully prime the cache, clear the key first with `loader.clear(key).prime(key, value)`. To prime the cache with an error, provide an Error instance.
 - **`clear(key)`**: Clear a key from cache
-- **`clearMany(keys)`**: Clear multiple keys from cache (extension method)
 - **`clearAll()`**: Clear all keys from cache
 
 All methods except `load` and `loadMany` return the instance for method chaining.
@@ -93,14 +92,14 @@ All methods except `load` and `loadMany` return the instance for method chaining
 
 - **DataLoader Compatible**: Implements the same API as Facebook's DataLoader
 - **Batching**: Groups individual loads that occur within a single tick of the event loop into a single batch
-- **Efficient Caching**: Uses Keyv's batch methods (getMany, setMany, deleteMany) for optimal performance
+- **Efficient Caching**: Uses Keyv's batch methods (getMany, setMany) for optimal performance
 - **Flexible Storage**: Works with any Keyv storage adapter (Redis, MongoDB, SQLite, etc.)
 - **TypeScript Support**: Fully typed API
 - **Method Chaining**: All methods that don't return Promises support method chaining
 
 ## Performance
 
-By leveraging Keyv's batch operations (`getMany`, `setMany`, and `deleteMany`), this implementation reduces the number of I/O operations required when working with multiple keys, resulting in better performance compared to individual operations, especially when using remote storage adapters like Redis.
+By leveraging Keyv's batch operations (`getMany`, `setMany`), this implementation reduces the number of I/O operations required when working with multiple keys, resulting in better performance compared to individual operations, especially when using remote storage adapters like Redis.
 
 ## License
 
