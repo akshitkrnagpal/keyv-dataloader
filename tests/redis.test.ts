@@ -9,20 +9,6 @@ describe('KeyvDataLoader with Redis store', () => {
     return keys.map((key) => `Redis value for ${key}`);
   });
 
-  // Skip tests if Redis is not available
-  beforeAll(async () => {
-    const store = new KeyvRedis(REDIS_URI);
-
-    try {
-      // Try to connect to Redis
-      // @ts-ignore - redis property exists at runtime
-      await store.redis.ping();
-    } catch (error) {
-      console.warn('Redis not available, skipping Redis tests');
-      return;
-    }
-  });
-
   // Reset mock and clear Redis before each test
   beforeEach(async () => {
     batchLoadFn.mockClear();
@@ -30,8 +16,7 @@ describe('KeyvDataLoader with Redis store', () => {
     // Clean Redis before each test
     try {
       const store = new KeyvRedis(REDIS_URI);
-      // @ts-ignore - redis property exists at runtime
-      await store.redis.flushdb();
+      await store.clear();
     } catch (error) {
       console.warn('Failed to flush Redis, some tests may fail');
     }
