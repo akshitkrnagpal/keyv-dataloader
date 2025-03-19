@@ -13,7 +13,7 @@ export interface KeyvDataLoaderOptions<K, V, C = K> {
   /**
    * TTL in milliseconds
    */
-  ttl?: number;
+  ttl: number;
   /**
    * DataLoader options
    */
@@ -34,7 +34,7 @@ export class KeyvDataLoader<K, V, C = K> {
   private dataloader: DataLoader<K, V, C>;
   private cache: Keyv<V>;
   private cacheKeyFn: (key: K) => string;
-  private ttl?: number;
+  private ttl: number;
 
   constructor(options: KeyvDataLoaderOptions<K, V, C>) {
     const {
@@ -142,11 +142,13 @@ export class KeyvDataLoader<K, V, C = K> {
    * Clears the value for the key from dataloader and cache.
    *
    * This behaves like DataLoader's clear method but also clears the key from Keyv cache.
+   *
+   * Returns a Promise that resolves to this instance for method chaining.
    */
-  clear(key: K): this {
+  async clear(key: K): Promise<this> {
     this.dataloader.clear(key);
-    // Fire and forget cache clearing - don't await
-    this.cache.delete(this.cacheKeyFn(key));
+    // Await cache clearing for proper error handling
+    await this.cache.delete(this.cacheKeyFn(key));
     return this;
   }
 
@@ -154,11 +156,13 @@ export class KeyvDataLoader<K, V, C = K> {
    * Clears the entire cache dataloader and Keyv.
    *
    * This behaves like DataLoader's clearAll method but also clears the entire Keyv cache.
+   *
+   * Returns a Promise that resolves to this instance for method chaining.
    */
-  clearAll(): this {
+  async clearAll(): Promise<this> {
     this.dataloader.clearAll();
-    // Fire and forget cache clearing - don't await
-    this.cache.clear();
+    // Await cache clearing for proper error handling
+    await this.cache.clear();
     return this;
   }
 
@@ -170,18 +174,21 @@ export class KeyvDataLoader<K, V, C = K> {
    *
    * To prime the cache with an error at a key, provide an Error instance.
    *
-   * Returns itself for method chaining.
+   * Returns a Promise that resolves to this instance for method chaining.
    */
-  prime(key: K, value: V | Error): this {
+  async prime(key: K, value: V | Error): Promise<this> {
     this.dataloader.prime(key, value);
 
     // Only cache in Keyv if the key doesn't exist and value is not an Error
     if (!(value instanceof Error)) {
-      this.cache.get(this.cacheKeyFn(key)).then((existingValue) => {
-        if (existingValue === undefined) {
-          this.cache.set(this.cacheKeyFn(key), value, this.ttl);
-        }
-      });
+      const existingValue = await this.cache.get(this.cacheKeyFn(key));
+      if (existingValue === undefined) {
+        await this.cache.set(this.cacheKeyFn(key), value, this.ttl);
+      }
+    } else {
+      // If priming with an error, make sure to delete the key from the cache
+      // This ensures the DataLoader error will be used when loading this key
+      await this.cache.delete(this.cacheKeyFn(key));
     }
 
     return this;

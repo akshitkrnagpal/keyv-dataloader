@@ -126,7 +126,7 @@ describe('KeyvDataLoader error handling', () => {
       expect(result).toBe('Value for key1');
 
       // Clear with the raw key (should work because of the cacheKeyFn)
-      loader.clear('key1');
+      await loader.clear('key1');
 
       // Now batch function should be called again
       await loader.load('key1');
@@ -154,6 +154,7 @@ describe('KeyvDataLoader error handling', () => {
       // Create loader with custom cache key function
       const loader = new KeyvDataLoader({
         batchLoadFn: batchFn,
+        ttl: 1000,
         cacheKeyFn,
       });
 
