@@ -5,11 +5,23 @@ A DataLoader implementation with caching support using [Keyv](https://github.com
 ## Installation
 
 ```bash
+# Install the package
 npm install keyv-dataloader
-# or
+
+# Install peer dependencies
+npm install dataloader keyv
+```
+
+```bash
+# Or with yarn
 yarn add keyv-dataloader
-# or
+yarn add dataloader keyv
+```
+
+```bash
+# Or with pnpm
 pnpm add keyv-dataloader
+pnpm add dataloader keyv
 ```
 
 ## Usage
