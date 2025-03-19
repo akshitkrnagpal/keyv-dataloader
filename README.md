@@ -5,10 +5,14 @@ A DataLoader implementation with caching support using [Keyv](https://github.com
 ## Installation
 
 ```bash
-# Install the package
-npm install keyv-dataloader
+# Install the package (recommended)
+pnpm add keyv-dataloader
+pnpm add dataloader keyv
+```
 
-# Install peer dependencies
+```bash
+# Or with npm
+npm install keyv-dataloader
 npm install dataloader keyv
 ```
 
@@ -16,12 +20,6 @@ npm install dataloader keyv
 # Or with yarn
 yarn add keyv-dataloader
 yarn add dataloader keyv
-```
-
-```bash
-# Or with pnpm
-pnpm add keyv-dataloader
-pnpm add dataloader keyv
 ```
 
 ## Usage
@@ -57,21 +55,28 @@ const value = await loader.load('key1');
 // Load multiple values (returns a Promise)
 const values = await loader.loadMany(['key2', 'key3']);
 
-// Prime the cache with a value (returns this for chaining)
+// Prime the cache with a value (returns a Promise that resolves to the instance for chaining)
 // If the key already exists, no change is made
-loader.prime('key4', 'Value for key4');
+await loader.prime('key4', 'Value for key4');
 
 // Prime the cache with an error
-loader.prime('key5', new Error('This is an error'));
+await loader.prime('key5', new Error('This is an error'));
 
-// Clear a value from cache (returns this for chaining)
-loader.clear('key1');
+// Clear a value from cache (returns a Promise that resolves to the instance for chaining)
+await loader.clear('key1');
 
-// Clear all cached values (returns this for chaining)
-loader.clearAll();
+// Clear all cached values (returns a Promise that resolves to the instance for chaining)
+await loader.clearAll();
 
-// Method chaining - force update a cached value
-loader.clear('key1').prime('key1', 'new value');
+// Method chaining with async/await
+const updatedLoader = await (await loader.clear('key1')).prime('key1', 'new value');
+
+// Alternative approach with Promise chaining
+loader.clear('key1')
+  .then(loader => loader.prime('key1', 'new value'))
+  .then(loader => {
+    // Continue using the loader...
+  });
 ```
 
 ## API
@@ -92,11 +97,11 @@ Creates a new `KeyvDataLoader` instance.
 
 - **`load(key)`**: Loads a key, returns a Promise for the value
 - **`loadMany(keys)`**: Loads multiple keys, returns a Promise for array of values
-- **`prime(key, value)`**: Prime the cache with a key-value pair. If the key already exists, no change is made. To forcefully prime the cache, clear the key first with `loader.clear(key).prime(key, value)`. To prime the cache with an error, provide an Error instance.
-- **`clear(key)`**: Clear a key from cache
-- **`clearAll()`**: Clear all keys from cache
+- **`prime(key, value)`**: Prime the cache with a key-value pair. Returns a Promise that resolves to the instance for method chaining. If the key already exists, no change is made. To forcefully prime the cache, clear the key first with `await loader.clear(key).prime(key, value)`. To prime the cache with an error, provide an Error instance.
+- **`clear(key)`**: Clear a key from cache. Returns a Promise that resolves to the instance for method chaining.
+- **`clearAll()`**: Clear all keys from cache. Returns a Promise that resolves to the instance for method chaining.
 
-All methods except `load` and `loadMany` return the instance for method chaining.
+All methods return Promises. The `clear()`, `clearAll()`, and `prime()` methods resolve to the instance for method chaining, while `load()` and `loadMany()` resolve to the loaded values.
 
 ## Features
 
@@ -105,7 +110,7 @@ All methods except `load` and `loadMany` return the instance for method chaining
 - **Efficient Caching**: Uses Keyv's batch methods (getMany, setMany) for optimal performance
 - **Redis Storage**: Works with Redis storage adapter via Keyv
 - **TypeScript Support**: Fully typed API
-- **Method Chaining**: All methods that don't return Promises support method chaining
+- **Method Chaining**: All methods support Promise-based method chaining
 
 ## Performance
 
@@ -116,11 +121,32 @@ By leveraging Keyv's batch operations (`getMany`, `setMany`), this implementatio
 The package includes a comprehensive test suite covering Redis storage adapter. See the [tests README](./tests/README.md) for detailed instructions on running tests.
 
 ```bash
+# Run all tests
+pnpm test
+
 # Run Redis tests only
 pnpm test:redis
 
 # Run all tests with Docker (requires Docker and Docker Compose)
 pnpm test:docker
+
+# Run tests with coverage
+pnpm test:coverage
+```
+
+## Development
+
+This project uses [changesets](https://github.com/changesets/changesets) for version management and publishing.
+
+```bash
+# Add a new changeset
+pnpm changeset
+
+# Update versions and changelogs
+pnpm version
+
+# Publish to npm
+pnpm release
 ```
 
 ## License

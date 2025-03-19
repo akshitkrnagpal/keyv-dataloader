@@ -1,4 +1,7 @@
 // This example demonstrates basic usage of KeyvDataLoader
+// To run this example: 
+// 1. Build the package: pnpm build
+// 2. Run the example: node examples/basic-usage.js
 const { KeyvDataLoader } = require('../dist');
 
 // Mock database access function
@@ -35,7 +38,7 @@ async function main() {
   console.log('✅ User 1 (from cache):', user1Again);
 
   console.log('\nPriming the cache with a value:');
-  userLoader.prime(4, {
+  await userLoader.prime(4, {
     id: 4,
     name: 'User 4 (Primed)',
     email: 'user4@example.com',
@@ -49,7 +52,7 @@ async function main() {
   console.log(
     '\nTrying to prime an existing key (should not change the value):'
   );
-  userLoader.prime(1, {
+  await userLoader.prime(1, {
     id: 1,
     name: 'User 1 (Modified)',
     email: 'modified1@example.com',
@@ -61,7 +64,8 @@ async function main() {
   console.log('✅ User 1 (should be unchanged):', user1NoChange);
 
   console.log('\nForce-priming an existing key using clear() and prime():');
-  userLoader.clear(1).prime(1, {
+  await userLoader.clear(1);
+  await userLoader.prime(1, {
     id: 1,
     name: 'User 1 (Force-Modified)',
     email: 'forcemodified1@example.com',
@@ -73,7 +77,7 @@ async function main() {
   console.log('✅ User 1 (should be changed):', user1Changed);
 
   console.log('\nPriming with an error:');
-  userLoader.prime(5, new Error('This is an error for user 5'));
+  await userLoader.prime(5, new Error('This is an error for user 5'));
   console.log('✅ Primed user 5 with an error');
 
   console.log('\nTrying to load user 5 (should get an error):');
@@ -91,7 +95,7 @@ async function main() {
   console.log('✅ User 3:', user3);
 
   console.log('\nClearing all cache:');
-  userLoader.clearAll();
+  await userLoader.clearAll();
   console.log('✅ All cache cleared');
 
   // Access all users (should be fetched from database)
