@@ -2,9 +2,9 @@ services:
   redis:
     image: redis:alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -12,9 +12,9 @@ services:
   memcached:
     image: memcached:alpine
     ports:
-      - "11211:11211"
+      - '11211:11211'
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "11211"]
+      test: ['CMD', 'nc', '-z', 'localhost', '11211']
       interval: 5s
       timeout: 5s
       retries: 5

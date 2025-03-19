@@ -1,5 +1,5 @@
-import DataLoader from "dataloader";
-import Keyv from "keyv";
+import DataLoader from 'dataloader';
+import Keyv from 'keyv';
 
 export interface KeyvDataLoaderOptions<K, V, C = K> {
   /**
@@ -53,7 +53,7 @@ export class KeyvDataLoader<K, V, C = K> {
     const wrappedBatchLoadFn = async (keys: readonly K[]): Promise<V[]> => {
       // Convert input keys to cache keys
       const cacheKeys = keys.map(this.cacheKeyFn);
-      
+
       // Get values from cache using getMany
       const cacheResults = await this.cache.getMany(cacheKeys);
 
@@ -72,7 +72,7 @@ export class KeyvDataLoader<K, V, C = K> {
         const result: V[] = [];
         for (const cachedValue of cacheResults) {
           if (cachedValue === undefined) {
-            throw new Error("Cache returned undefined value");
+            throw new Error('Cache returned undefined value');
           }
           result.push(cachedValue as V);
         }
@@ -86,7 +86,7 @@ export class KeyvDataLoader<K, V, C = K> {
       const entries: KeyvEntry<V>[] = uncachedKeys.map((key, index) => ({
         key: this.cacheKeyFn(key),
         value: loadedValues[index],
-        ttl: this.ttl
+        ttl: this.ttl,
       }));
 
       // Cache the loaded values using setMany
@@ -102,7 +102,7 @@ export class KeyvDataLoader<K, V, C = K> {
       const finalResults: V[] = [];
       for (const result of results) {
         if (result === undefined) {
-          throw new Error("Result is unexpectedly undefined");
+          throw new Error('Result is unexpectedly undefined');
         }
         finalResults.push(result);
       }
@@ -118,7 +118,7 @@ export class KeyvDataLoader<K, V, C = K> {
 
   /**
    * Loads a key, returning a `Promise` for the value represented by that key.
-   * 
+   *
    * This behaves identically to DataLoader's load method.
    */
   load(key: K): Promise<V> {
@@ -127,7 +127,7 @@ export class KeyvDataLoader<K, V, C = K> {
 
   /**
    * Loads multiple keys, returning a Promise that resolves to an array of values.
-   * 
+   *
    * This behaves identically to DataLoader's loadMany method.
    */
   loadMany(keys: K[]): Promise<(V | Error)[]> {
@@ -136,7 +136,7 @@ export class KeyvDataLoader<K, V, C = K> {
 
   /**
    * Clears the value for the key from dataloader and cache.
-   * 
+   *
    * This behaves like DataLoader's clear method but also clears the key from Keyv cache.
    */
   clear(key: K): this {
@@ -148,7 +148,7 @@ export class KeyvDataLoader<K, V, C = K> {
 
   /**
    * Clears the entire cache dataloader and Keyv.
-   * 
+   *
    * This behaves like DataLoader's clearAll method but also clears the entire Keyv cache.
    */
   clearAll(): this {
@@ -161,25 +161,25 @@ export class KeyvDataLoader<K, V, C = K> {
   /**
    * Primes the cache with the provided key and value.
    * If the key already exists, no change is made.
-   * (To forcefully prime the cache, clear the key first with 
+   * (To forcefully prime the cache, clear the key first with
    * loader.clear(key).prime(key, value).)
-   * 
+   *
    * To prime the cache with an error at a key, provide an Error instance.
-   * 
+   *
    * Returns itself for method chaining.
    */
   prime(key: K, value: V | Error): this {
     this.dataloader.prime(key, value);
-    
+
     // Only cache in Keyv if the key doesn't exist and value is not an Error
     if (!(value instanceof Error)) {
-      this.cache.get(this.cacheKeyFn(key)).then(existingValue => {
+      this.cache.get(this.cacheKeyFn(key)).then((existingValue) => {
         if (existingValue === undefined) {
           this.cache.set(this.cacheKeyFn(key), value, this.ttl);
         }
       });
     }
-    
+
     return this;
   }
 }

@@ -34,7 +34,7 @@ const loader = new KeyvDataLoader({
   // Function to batch load keys
   batchLoadFn: async (keys) => {
     console.log('Loading keys:', keys);
-    return keys.map(key => `Value for ${key}`);
+    return keys.map((key) => `Value for ${key}`);
   },
   // Optional: Custom function to generate cache keys
   cacheKeyFn: (key) => `custom-prefix:${key}`,
@@ -42,13 +42,13 @@ const loader = new KeyvDataLoader({
   ttl: 60 * 1000, // 1 minute
   // Optional: Keyv options (storage adapters, etc.)
   keyvOptions: {
-    namespace: 'my-cache'
+    namespace: 'my-cache',
   },
   // Optional: DataLoader options
   dataLoaderOptions: {
     maxBatchSize: 100,
-    cache: true
-  }
+    cache: true,
+  },
 });
 
 // Load a single value (returns a Promise)
@@ -71,9 +71,7 @@ loader.clear('key1');
 loader.clearAll();
 
 // Method chaining - force update a cached value
-loader
-  .clear('key1')
-  .prime('key1', 'new value');
+loader.clear('key1').prime('key1', 'new value');
 ```
 
 ## API
@@ -86,7 +84,7 @@ Creates a new `KeyvDataLoader` instance.
 
 - `batchLoadFn`: Function to batch load multiple keys
 - `cacheKeyFn` (optional): Function to generate cache key from the input key
-- `ttl` (optional): TTL in milliseconds for cache entries 
+- `ttl` (optional): TTL in milliseconds for cache entries
 - `dataLoaderOptions` (optional): DataLoader options
 - `keyvOptions` (optional): Keyv options
 
