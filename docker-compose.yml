@@ -8,13 +8,3 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-  memcached:
-    image: memcached:alpine
-    ports:
-      - '11211:11211'
-    healthcheck:
-      test: ['CMD', 'nc', '-z', 'localhost', '11211']
-      interval: 5s
-      timeout: 5s
-      retries: 5

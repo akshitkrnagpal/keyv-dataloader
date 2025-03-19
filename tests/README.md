@@ -1,27 +1,27 @@
 # Testing keyv-dataloader
 
-This directory contains tests for the `keyv-dataloader` package. Tests cover various scenarios including in-memory, Redis, and Memcached storage adapters.
+This directory contains tests for the `keyv-dataloader` package. Tests cover various scenarios with Redis storage adapter.
 
 ## Test Structure
 
-- **memory.test.ts**: Tests with the default in-memory store
 - **redis.test.ts**: Tests with Redis storage adapter
-- **memcached.test.ts**: Tests with Memcached storage adapter
 - **error-handling.test.ts**: Tests for error handling and edge cases
 
 ## Running Tests
 
-### In-Memory Tests
+### Redis Tests
 
-Run the in-memory tests (no external dependencies required):
+Run the Redis tests:
 
 ```bash
-pnpm test:memory
+pnpm test:redis
 ```
+
+This requires Redis to be running on localhost:6379.
 
 ### All Tests with Docker
 
-To run all tests including Redis and Memcached tests, use the Docker setup:
+To run all tests with Redis, use the Docker setup:
 
 ```bash
 # Start Docker containers, run tests, then stop containers
@@ -29,16 +29,6 @@ pnpm test:docker
 ```
 
 This requires Docker and Docker Compose to be installed on your system.
-
-### Running Individual Test Suites
-
-```bash
-# Run Redis tests only
-pnpm test:redis
-
-# Run Memcached tests only
-pnpm test:memcached
-```
 
 ### Other Test Commands
 
@@ -49,24 +39,19 @@ pnpm test
 # Watch mode (auto-rerun on file changes)
 pnpm test:watch
 
-# Generate coverage report
+# Run tests with coverage report
 pnpm test:coverage
 ```
 
 ## Docker Setup
 
-The project includes a `docker-compose.yml` file that sets up:
-
-1. Redis server on port 6379
-2. Memcached server on port 11211
-
-You can manually start these containers with:
+The `docker-compose.yml` file in the root directory sets up the required Redis container for testing. You can start it manually with:
 
 ```bash
 docker-compose up -d
 ```
 
-And stop them with:
+And shut it down with:
 
 ```bash
 docker-compose down

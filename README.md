@@ -103,21 +103,21 @@ All methods except `load` and `loadMany` return the instance for method chaining
 - **DataLoader Compatible**: Implements the same API as Facebook's DataLoader
 - **Batching**: Groups individual loads that occur within a single tick of the event loop into a single batch
 - **Efficient Caching**: Uses Keyv's batch methods (getMany, setMany) for optimal performance
-- **Flexible Storage**: Works with any Keyv storage adapter (Redis, MongoDB, SQLite, etc.)
+- **Redis Storage**: Works with Redis storage adapter via Keyv
 - **TypeScript Support**: Fully typed API
 - **Method Chaining**: All methods that don't return Promises support method chaining
 
 ## Performance
 
-By leveraging Keyv's batch operations (`getMany`, `setMany`), this implementation reduces the number of I/O operations required when working with multiple keys, resulting in better performance compared to individual operations, especially when using remote storage adapters like Redis.
+By leveraging Keyv's batch operations (`getMany`, `setMany`), this implementation reduces the number of I/O operations required when working with multiple keys, resulting in better performance compared to individual operations, especially when using Redis.
 
 ## Testing
 
-The package includes a comprehensive test suite covering in-memory, Redis, and Memcached storage adapters. See the [tests README](./tests/README.md) for detailed instructions on running tests.
+The package includes a comprehensive test suite covering Redis storage adapter. See the [tests README](./tests/README.md) for detailed instructions on running tests.
 
 ```bash
-# Run in-memory tests only (no dependencies required)
-pnpm test:memory
+# Run Redis tests only
+pnpm test:redis
 
 # Run all tests with Docker (requires Docker and Docker Compose)
 pnpm test:docker
