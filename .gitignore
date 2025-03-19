@@ -21,6 +21,9 @@ yarn-error.log*
 *.sln
 *.sw?
 
+# Coverage directory used by tools like istanbul
+coverage
+
 # OS
 .DS_Store
 Thumbs.db
