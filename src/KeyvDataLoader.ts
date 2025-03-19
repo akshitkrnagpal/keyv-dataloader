@@ -24,12 +24,6 @@ export interface KeyvDataLoaderOptions<K, V, C = K> {
   keyvOptions?: ConstructorParameters<typeof Keyv>[0];
 }
 
-interface KeyvEntry<V> {
-  key: string;
-  value: V;
-  ttl?: number;
-}
-
 export class KeyvDataLoader<K, V, C = K> {
   private dataloader: DataLoader<K, V, C>;
   private cache: Keyv<V>;
@@ -82,13 +76,11 @@ export class KeyvDataLoader<K, V, C = K> {
       const loadedValues = await batchLoadFn(uncachedKeys);
 
       // Prepare entries for setMany
-      const entries: KeyvEntry<V | Error>[] = uncachedKeys.map(
-        (key, index) => ({
-          key: this.cacheKeyFn(key),
-          value: loadedValues[index],
-          ttl: this.ttl,
-        })
-      );
+      const entries = uncachedKeys.map((key, index) => ({
+        key: this.cacheKeyFn(key),
+        value: loadedValues[index],
+        ttl: this.ttl,
+      }));
 
       // Set cache entries
       await Promise.all(
