@@ -28,7 +28,11 @@
     "batching",
     "graphql"
   ],
-  "author": "",
+  "author": {
+    "name": "Akshit Kr Nagpal",
+    "email": "akshitkrnagpal@gmail.com",
+    "url": "https://github.com/akshitkrnagpal"
+  },
   "license": "MIT",
   "packageManager": "pnpm@10.4.1",
   "devDependencies": {
