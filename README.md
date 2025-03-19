@@ -68,10 +68,11 @@ await loader.clear('key1');
 // Clear all cached values (returns a Promise that resolves to the instance for chaining)
 await loader.clearAll();
 
-// Method chaining with async/await
-const updatedLoader = await (await loader.clear('key1')).prime('key1', 'new value');
+// Sequential calls for forcefully updating a cached value
+await loader.clear('key1');
+await loader.prime('key1', 'new value');
 
-// Alternative approach with Promise chaining
+// Using Promise chaining
 loader.clear('key1')
   .then(loader => loader.prime('key1', 'new value'))
   .then(loader => {
@@ -97,7 +98,7 @@ Creates a new `KeyvDataLoader` instance.
 
 - **`load(key)`**: Loads a key, returns a Promise for the value
 - **`loadMany(keys)`**: Loads multiple keys, returns a Promise for array of values
-- **`prime(key, value)`**: Prime the cache with a key-value pair. Returns a Promise that resolves to the instance for method chaining. If the key already exists, no change is made. To forcefully prime the cache, clear the key first with `await loader.clear(key).prime(key, value)`. To prime the cache with an error, provide an Error instance.
+- **`prime(key, value)`**: Prime the cache with a key-value pair. Returns a Promise that resolves to the instance for method chaining. If the key already exists, no change is made. To forcefully prime the cache, clear the key first with sequential calls: `await loader.clear(key); await loader.prime(key, value);`. To prime the cache with an error, provide an Error instance.
 - **`clear(key)`**: Clear a key from cache. Returns a Promise that resolves to the instance for method chaining.
 - **`clearAll()`**: Clear all keys from cache. Returns a Promise that resolves to the instance for method chaining.
 
