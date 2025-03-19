@@ -5,7 +5,7 @@ export interface KeyvDataLoaderOptions<K, V, C = K> {
   /**
    * Function to batch load multiple keys
    */
-  batchLoadFn: (keys: readonly K[]) => Promise<V[]>;
+  batchLoadFn: DataLoader.BatchLoadFn<K, V>;
   /**
    * Function to generate cache key from the input key
    */
@@ -50,7 +50,9 @@ export class KeyvDataLoader<K, V, C = K> {
     this.cache = new Keyv<V>({ ttl, ...keyvOptions });
 
     // Create a wrapper around batchLoadFn that checks cache first
-    const wrappedBatchLoadFn = async (keys: readonly K[]): Promise<V[]> => {
+    const wrappedBatchLoadFn = async (
+      keys: readonly K[]
+    ): Promise<(V | Error)[]> => {
       // Convert input keys to cache keys
       const cacheKeys = keys.map(this.cacheKeyFn);
 
@@ -69,12 +71,9 @@ export class KeyvDataLoader<K, V, C = K> {
 
       if (uncachedKeys.length === 0) {
         // All values were in cache
-        const result: V[] = [];
+        const result: (V | Error)[] = [];
         for (const cachedValue of cacheResults) {
-          if (cachedValue === undefined) {
-            throw new Error('Cache returned undefined value');
-          }
-          result.push(cachedValue as V);
+          result.push(cachedValue as V | Error);
         }
         return result;
       }
@@ -83,11 +82,13 @@ export class KeyvDataLoader<K, V, C = K> {
       const loadedValues = await batchLoadFn(uncachedKeys);
 
       // Prepare entries for setMany
-      const entries: KeyvEntry<V>[] = uncachedKeys.map((key, index) => ({
-        key: this.cacheKeyFn(key),
-        value: loadedValues[index],
-        ttl: this.ttl,
-      }));
+      const entries: KeyvEntry<V | Error>[] = uncachedKeys.map(
+        (key, index) => ({
+          key: this.cacheKeyFn(key),
+          value: loadedValues[index],
+          ttl: this.ttl,
+        })
+      );
 
       // Set cache entries
       await Promise.all(
@@ -97,18 +98,15 @@ export class KeyvDataLoader<K, V, C = K> {
       );
 
       // Merge cached and loaded results
-      const results: (V | undefined)[] = [...cacheResults];
+      const results: (V | Error | undefined)[] = [...cacheResults];
       uncachedIndices.forEach((index, arrayIndex) => {
         results[index] = loadedValues[arrayIndex];
       });
 
       // Convert to final result format, handling undefined
-      const finalResults: V[] = [];
+      const finalResults: (V | Error)[] = [];
       for (const result of results) {
-        if (result === undefined) {
-          throw new Error('Result is unexpectedly undefined');
-        }
-        finalResults.push(result);
+        finalResults.push(result as V | Error);
       }
 
       return finalResults;
