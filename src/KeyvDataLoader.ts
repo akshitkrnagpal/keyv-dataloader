@@ -17,7 +17,7 @@ export interface KeyvDataLoaderOptions<K, V, C = K> {
   /**
    * DataLoader options
    */
-  dataLoaderOptions?: DataLoader.Options<K, V, C>;
+  dataLoaderOptions?: Omit<DataLoader.Options<K, V, C>, 'cache'>;
   /**
    * Keyv options
    */
@@ -110,10 +110,10 @@ export class KeyvDataLoader<K, V, C = K> {
       return finalResults;
     };
 
-    this.dataloader = new DataLoader<K, V, C>(
-      wrappedBatchLoadFn,
-      dataLoaderOptions
-    );
+    this.dataloader = new DataLoader<K, V, C>(wrappedBatchLoadFn, {
+      ...dataLoaderOptions,
+      cache: false,
+    });
   }
 
   /**

@@ -98,6 +98,7 @@ describe('KeyvDataLoader with Redis store', () => {
     beforeEach(() => {
       loader = new KeyvDataLoader({
         batchLoadFn,
+        ttl: 1000,
         keyvOptions: {
           store: new KeyvRedis(REDIS_URI),
           namespace: 'test-clear',
@@ -144,6 +145,7 @@ describe('KeyvDataLoader with Redis store', () => {
     beforeEach(() => {
       loader = new KeyvDataLoader({
         batchLoadFn,
+        ttl: 1000,
         keyvOptions: {
           store: new KeyvRedis(REDIS_URI),
           namespace: 'test-prime',
