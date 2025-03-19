@@ -15,6 +15,7 @@ describe('KeyvDataLoader error handling', () => {
 
       const loader = new KeyvDataLoader({
         batchLoadFn: errorBatchFn,
+        ttl: 1000,
       });
 
       // Should handle error properly
@@ -38,6 +39,7 @@ describe('KeyvDataLoader error handling', () => {
 
       const loader = new KeyvDataLoader({
         batchLoadFn: mixedBatchFn,
+        ttl: 1000,
       });
 
       // loadMany should return a mix of values and errors
@@ -56,6 +58,7 @@ describe('KeyvDataLoader error handling', () => {
 
       const loader = new KeyvDataLoader({
         batchLoadFn: batchFn,
+        ttl: 1000,
       });
 
       const results = await loader.loadMany([]);
@@ -70,6 +73,7 @@ describe('KeyvDataLoader error handling', () => {
         batchLoadFn: async (keys: readonly string[]) => {
           return keys.map((key) => `${largeString}-${key}`);
         },
+        ttl: 1000,
       });
 
       const result = await loader.load('large-key');
@@ -89,6 +93,7 @@ describe('KeyvDataLoader error handling', () => {
             return `Value for ${key}`;
           });
         },
+        ttl: 1000,
       });
 
       const result = await loader.load('null-key');
@@ -111,6 +116,7 @@ describe('KeyvDataLoader error handling', () => {
       const loader = new KeyvDataLoader({
         batchLoadFn: batchFn,
         cacheKeyFn: (key) => `custom:${key}`,
+        ttl: 1000,
       });
 
       // First call should use the batch function
