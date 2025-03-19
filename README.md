@@ -113,6 +113,18 @@ All methods except `load` and `loadMany` return the instance for method chaining
 
 By leveraging Keyv's batch operations (`getMany`, `setMany`), this implementation reduces the number of I/O operations required when working with multiple keys, resulting in better performance compared to individual operations, especially when using remote storage adapters like Redis.
 
+## Testing
+
+The package includes a comprehensive test suite covering in-memory, Redis, and Memcached storage adapters. See the [tests README](./tests/README.md) for detailed instructions on running tests.
+
+```bash
+# Run in-memory tests only (no dependencies required)
+pnpm test:memory
+
+# Run all tests with Docker (requires Docker and Docker Compose)
+pnpm test:docker
+```
+
 ## License
 
 MIT
